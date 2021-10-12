@@ -28,7 +28,11 @@ RUN apt-get -qq update --fix-missing
 RUN apt-get install -qq -y --fix-missing python3-dev python3-pip git bash-completion
 RUN pip3 install scons==4.1.0
 RUN apt-get install -qq -y libyaml-cpp-dev libboost-dev libboost-filesystem-dev libboost-system-dev vim
-
+RUN pip3 install numpy ruamel.yaml
+RUN DEBIAN_FRONTEND="noninteractive" apt -qq -y install software-properties-common
+RUN apt-add-repository ppa:cantera-team/cantera
+RUN apt -qq -y install cantera-python3
+#
 # Link python to python3
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
@@ -58,7 +62,7 @@ RUN chmod 777 /sw/openmkm/src
 RUN /bin/bash -c "source /sw/cantera_install/bin/setup_cantera; cd /sw/openmkm/src; scons"
 
 ENV PATH="/sw/openmkm/src:${PATH}"
-
+ENV PYTHONPATH="/sw/cantera/interfaces/cython/cantera:${PYTHONPATH}"
 #WORKDIR /home
 
 # Default command
