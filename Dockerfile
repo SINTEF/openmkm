@@ -44,7 +44,7 @@ FROM dependencies AS build
 # Install Cantera, openmkm-version
 RUN mkdir -p /sw
 RUN cd /sw && git clone https://github.com/SINTEF/cantera.git
-RUN cd /sw/cantera && git checkout openmkm && scons build optimize=False python_package=n f90_interface=n doxygen_docs=n system_eigen=n system_sundials=n prefix=/sw/cantera_install use_rpath_linkage=False && scons install
+RUN cd /sw/cantera && git checkout oopenmkmm && scons build optimize=False python_package=n f90_interface=n doxygen_docs=n system_eigen=n system_sundials=n prefix=/sw/cantera_install use_rpath_linkage=False && scons install
 
 # Set up OpenMKM
 
