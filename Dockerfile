@@ -28,6 +28,11 @@ RUN apt-get -qq update --fix-missing
 RUN apt-get install -qq -y --fix-missing python3-dev python3-pip git bash-completion
 RUN pip3 install scons==4.1.0
 RUN apt-get install -qq -y libyaml-cpp-dev libboost-dev libboost-filesystem-dev libboost-system-dev vim
+RUN pip3 install numpy ruamel.yaml Cython
+#RUN DEBIAN_FRONTEND="noninteractive" apt -qq -y install software-properties-common
+#RUN apt-add-repository ppa:cantera-team/cantera
+#RUN apt -qq -y install cantera-python3
+ENV PYTHONPATH /sw/cantera_install/lib/python3.8/site-packages:$PYTHONPATH
 
 # Link python to python3
 RUN ln -s /usr/bin/python3 /usr/bin/python
@@ -40,12 +45,13 @@ FROM dependencies AS build
 # Install Cantera, openmkm-version
 RUN mkdir -p /sw
 RUN cd /sw && git clone https://github.com/SINTEF/cantera.git
-RUN cd /sw/cantera && git checkout openmkm && scons build optimize=False python_package=n f90_interface=n doxygen_docs=n system_eigen=n system_sundials=n prefix=/sw/cantera_install use_rpath_linkage=False && scons install
+RUN cd /sw/cantera && git checkout openmkm && scons build optimize=False python_package=y f90_interface=n doxygen_docs=n system_eigen=n system_sundials=n prefix=/sw/cantera_install use_rpath_linkage=False && scons install
 
 # Set up OpenMKM
 
 RUN mkdir -p /sw/openmkm
 
+COPY setup.py /sw/setup.py
 COPY docs /sw/openmkm/docs
 COPY examples /sw/openmkm/examples
 COPY hetero_ct /sw/openmkm/hetero_ct
@@ -57,11 +63,16 @@ RUN chmod 777 /sw/openmkm/src
 
 RUN /bin/bash -c "source /sw/cantera_install/bin/setup_cantera; cd /sw/openmkm/src; scons"
 
-ENV PATH="/sw/openmkm/src:${PATH}"
+ENV PATH="/sw/openmkm/scripts:/sw/openmkm/src:${PATH}"
+ENV PYTHONPATH="/sw/openmkm/scripts:${PYTHONPATH}"
+RUN cp /sw/openmkm/scripts/* /sw/cantera_install/lib/python3.8/site-packages/cantera
+
+RUN cd /sw && pip install .
 
 #WORKDIR /home
 
 # Default command
 
 #CMD ["/bin/bash"]
-
+# ny stage starte med clean minimalistisk image
+# COPY --from:build/
