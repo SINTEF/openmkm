@@ -1,5 +1,9 @@
-env = Environment(CPPPATH=["/usr/local/include", 
-			   "/usr/local/include/cantera/ext"],
+import os
+
+cantera_prefix = os.environ.get("CANTERA_PREFIX", "/usr/local")
+
+env = Environment(CPPPATH=[f"{cantera_prefix}/include",
+                     f"{cantera_prefix}/include/cantera/ext"],
                   CCFLAGS=["-std=c++11", "-Wall", "-Wno-inline", "-O0", "-g",
                            "-fprofile-arcs", "-ftest-coverage", "-pthread"],
                   LINKFLAGS = ["-fprofile-arcs", 
@@ -12,6 +16,6 @@ sources = ["main.cpp", "util.cpp", "zerodReactor.cpp", "onedReactor.cpp",
            ]
 
 env.Program(target="omkm", source=sources, 
-            LIBS=["cantera", 
+            LIBS=["cantera", "yaml-cpp",
                   "boost_filesystem", "boost_system"],
-            LIBPATH=["/usr/local/lib"])
+            LIBPATH=[f"{cantera_prefix}/lib"])

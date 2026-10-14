@@ -48,14 +48,13 @@ RUN mkdir -p /sw/openmkm
 
 COPY docs /sw/openmkm/docs
 COPY examples /sw/openmkm/examples
-COPY hetero_ct /sw/openmkm/hetero_ct
 COPY scripts /sw/openmkm/scripts
 COPY src /sw/openmkm/src
 COPY test_files /sw/openmkm/test_files
 
 RUN chmod 777 /sw/openmkm/src
 
-RUN /bin/bash -c "source /sw/cantera_install/bin/setup_cantera; cd /sw/openmkm/src; scons"
+RUN /bin/bash -c "source /sw/cantera_install/bin/setup_cantera; export CANTERA_PREFIX=/sw/cantera_install; cd /sw/openmkm/src; scons"
 
 ENV PATH="/sw/openmkm/src:${PATH}"
 
